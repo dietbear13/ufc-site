@@ -1,35 +1,28 @@
 <template>
-  <section>
-    <h1 class="text-3xl font-bold text-secondary mb-4">Все турниры</h1>
-    <!-- Фильтр по названию турнира -->
-    <v-text-field v-model="search" label="Поиск турнира..." outlined dense class="mb-4" />
-    <!-- Сетка карточек турниров -->
-    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-      <EventCard
-          v-for="event in filteredEvents" :key="event.slug"
-          :event="event" />
-    </div>
-  </section>
+  <v-container>
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h4 font-weight-bold mb-6">Турниры UFC</h1>
+      </v-col>
+
+      <v-col
+          v-for="event in events"
+          :key="event.id"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+      >
+        <EventCard :event="event" />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
-<script setup lang="ts">
-// import EventCard from '~/components/EventCard.vue';
-// import { useEvents } from '~/composables/useEvents';
-//
-// const { events } = useEvents();
-// const search = ref('');
-// const filteredEvents = computed(() => {
-//   if (!search.value) return events.value;
-//   return events.value.filter(evt =>
-//       evt.title.toLowerCase().includes(search.value.toLowerCase()) ||
-//       evt.place?.toLowerCase().includes(search.value.toLowerCase())
-//   );
-// });
+<script setup>
+import EventCard from '@/components/EventCard.vue'
+import { useEvents } from '@/composables/useEvents.js'
 
-useHead({
-  title: 'Турниры UFC – расписание и результаты',
-  meta: [
-    { name: 'description', content: 'Список турниров UFC: даты, места проведения и участники.' }
-  ]
-});
+const { events, loadEvents } = useEvents()
+await loadEvents()
 </script>
