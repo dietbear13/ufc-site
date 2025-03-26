@@ -79,7 +79,7 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
-import { useEvents } from '@/composables/useEvents.js'
+import { useEvents } from '@/composables/useEvents'
 
 const route = useRoute()
 const { events, loadEvents } = useEvents()

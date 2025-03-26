@@ -30,12 +30,7 @@
 </template>
 
 <script setup>
-defineProps({
-  event: {
-    type: Object,
-    required: true
-  }
-})
+const { event } = defineProps(['event'])
 
 const formattedDate = computed(() => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
