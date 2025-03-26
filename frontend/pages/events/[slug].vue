@@ -80,7 +80,14 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useEvents } from '@/composables/useEvents'
+import { useSeoSchemaBuilder } from '@/composables/useSeoSchemaBuilder'
 
+useSeoSchemaBuilder('event', event.value)
+watchEffect(() => {
+  if (event.value) {
+    useSeoSchemaBuilder('event', event.value)
+  }
+})
 const route = useRoute()
 const { events, loadEvents } = useEvents()
 const event = ref(null)

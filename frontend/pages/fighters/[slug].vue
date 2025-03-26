@@ -77,12 +77,22 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useFighters } from '@/composables/useFighters.js'
+import { useSeoSchemaBuilder } from '@/composables/useSeoSchemaBuilder'
+
+// после получения данных:
+useSeoSchemaBuilder('fighter', fighter.value)
 
 const route = useRoute()
 const { fighters, loadFighters } = useFighters()
 const fighter = ref(null)
 
 await loadFighters()
+// после загрузки бойца:
+watchEffect(() => {
+  if (fighter.value) {
+    useSeoSchemaBuilder('fighter', fighter.value)
+  }
+})
 
 fighter.value = fighters.value.find(
     (f) => f.slug === route.params.slug
