@@ -38,6 +38,9 @@ const formattedDate = computed(() => {
 })
 </script>
 
+
+<!--У меня есть скрипт парсер, который собирает все турниры и бойцов в md-файлы, но это устаревший подход для моего проекта, давай адаптируем.-->
+
 <style scoped>
 .event-card {
   transition: transform 0.2s;

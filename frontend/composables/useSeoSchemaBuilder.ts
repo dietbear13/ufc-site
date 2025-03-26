@@ -63,4 +63,20 @@ export function useSeoSchemaBuilder(type: 'fighter' | 'event', data: any) {
             children: JSON.stringify(s)
         }))
     })
+
+    if (type === 'breadcrumbs') {
+        const crumbs = data
+
+        schema.push({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: crumbs.map((crumb: any, index: number) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: crumb.name,
+                item: `${baseUrl}${crumb.link}`
+            }))
+        })
+    }
+
 }

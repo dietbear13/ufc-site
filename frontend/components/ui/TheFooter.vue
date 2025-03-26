@@ -1,6 +1,5 @@
 <template>
   <v-footer
-      app
       color="grey lighten-4"
       class="pa-6 mt-12"
       style="width: 100%"
@@ -52,7 +51,6 @@
 
 <script setup>
 const links = [
-  { name: 'Главная', to: '/' },
   { name: 'Бойцы', to: '/fighters' },
   { name: 'Турниры', to: '/events' },
   { name: 'Блог', to: '/blog' }

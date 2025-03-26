@@ -5,7 +5,7 @@
     "name": "UFC 300",
     "date": "2025-04-12",
     "location": "Las Vegas, Nevada",
-    "poster": "/assets/images/ufc_logo.jpg",
+    "poster": "/images/events/ufc300.jpg",
     "main_card": [
       {
         "fighter1": "Jon Jones",
@@ -25,7 +25,7 @@
     "name": "UFC Fight Night 236",
     "date": "2025-03-30",
     "location": "London, UK",
-    "poster": "/assets/images/ufc_logo.jpg",
+    "poster": "/images/events/fn236.jpg",
     "main_card": [
       {
         "fighter1": "Arnold Allen",

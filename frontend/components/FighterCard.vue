@@ -7,27 +7,35 @@
       link
   >
     <v-img
-        :src="fighter.image"
-        height="240"
+        :src="imageSrc"
+        max-height="240"
         cover
         class="rounded-t-lg"
-    ></v-img>
+        @error="onImageError"
+    />
 
     <v-card-text>
       <div class="text-h6 font-weight-bold">
         {{ fighter.name }}
       </div>
-      <div class="text-subtitle-2 text-grey-darken-1 mb-1">
-        "{{ fighter.nickname }}"
+
+      <div
+          v-if="fighter.nickname"
+          class="text-subtitle-2 text-grey-darken-1 mb-1"
+      >
+        «{{ fighter.nickname }}»
       </div>
+
       <div class="text-body-2">
         <v-icon icon="mdi-flag" size="16" class="mr-1" />
         {{ fighter.country }}
       </div>
+
       <div class="text-body-2">
         <v-icon icon="mdi-weight-lifter" size="16" class="mr-1" />
         {{ fighter.division }}
       </div>
+
       <div class="text-body-2">
         <v-icon icon="mdi-sword-cross" size="16" class="mr-1" />
         {{ fighter.record }}
@@ -36,13 +44,25 @@
   </v-card>
 </template>
 
-<script setup>
-defineProps({
+<script setup lang="ts">
+const props = defineProps<{
   fighter: {
-    type: Object,
-    required: true
+    name: string
+    nickname?: string
+    country: string
+    division: string
+    record: string
+    slug: string
+    image?: string
   }
-})
+}>()
+
+const defaultImage = '/images/fighter_default.png'
+const imageSrc = ref(props.fighter.image || defaultImage)
+
+const onImageError = () => {
+  imageSrc.value = defaultImage
+}
 </script>
 
 <style scoped>
