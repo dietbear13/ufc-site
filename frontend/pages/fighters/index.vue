@@ -21,4 +21,11 @@ import { useFighters } from '../../composables/useFighters'
 
 const { fighters, loadFighters } = useFighters()
 await loadFighters()
+
+useSeoHead({
+  title: 'Список бойцов UFC',
+  description: 'Актуальные профили бойцов UFC с фото, страной, рекордами и весом.',
+  canonical: 'http://localhost:3000/fighters'
+})
+
 </script>

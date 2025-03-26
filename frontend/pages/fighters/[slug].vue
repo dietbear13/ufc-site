@@ -44,6 +44,12 @@ await loadFighters()
 fighter.value = fighters.value.find(f => f.slug === route.params.slug)
 
 watchEffect(() => {
-  if (fighter.value) useSeoSchemaBuilder('fighter', fighter.value)
+  if (fighter.value) {
+    useSeoSchemaBuilder('fighter', fighter.value)
+    useSeoHead({
+      title: fighter.value.name,
+      canonical: `http://localhost:3000/fighters/${fighter.value.slug}`
+    })
+  }
 })
 </script>
