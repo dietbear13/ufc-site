@@ -2,7 +2,7 @@
   <v-container v-if="fighter">
     <v-row>
       <v-col cols="12" md="4">
-        <v-img :src="fighter.image" aspect-ratio="1" cover class="rounded-lg" />
+        <v-img :src="fighter.image" aspect-ratio="1"  cover class="rounded-lg" />
       </v-col>
 
       <v-col cols="12" md="8">

@@ -1,41 +1,30 @@
 <template>
-  <nav
-      class="breadcrumbs"
-      aria-label="Хлебные крошки"
-      itemscope
-      itemtype="https://schema.org/BreadcrumbList"
-  >
+  <nav class="breadcrumbs" aria-label="Хлебные крошки">
     <v-row align="center" no-gutters class="flex-nowrap">
       <template v-for="(crumb, index) in breadcrumbs" :key="index">
         <!-- Разделитель -->
-        <v-icon v-if="index !== 0" class="mx-2" color="grey-darken-1" size="18">mdi-chevron-right</v-icon>
-
-        <!-- Ссылка или активный элемент -->
-        <span
-            v-if="crumb.link"
-            itemprop="itemListElement"
-            itemscope
-            itemtype="https://schema.org/ListItem"
+        <v-icon
+            v-if="index !== 0"
+            class="mx-2"
+            color="grey-darken-1"
+            size="18"
         >
-          <NuxtLink
-              :to="crumb.link"
-              class="breadcrumb-link"
-              itemprop="item"
-          >
-            <span itemprop="name">{{ crumb.name }}</span>
-          </NuxtLink>
-          <meta itemprop="position" :content="index + 1" />
+          mdi-chevron-right
+        </v-icon>
+
+        <!-- Последний пункт — всегда текст -->
+        <span
+            v-if="index === breadcrumbs.length - 1"
+            class="breadcrumb-current"
+        >
+          {{ crumb.name }}
         </span>
 
-        <span
-            v-else
-            class="breadcrumb-current"
-            itemprop="itemListElement"
-            itemscope
-            itemtype="https://schema.org/ListItem"
-        >
-          <span itemprop="name">{{ crumb.name }}</span>
-          <meta itemprop="position" :content="index + 1" />
+        <!-- Все предыдущие — кликабельные -->
+        <span v-else>
+          <NuxtLink :to="crumb.link" class="breadcrumb-link">
+            {{ crumb.name }}
+          </NuxtLink>
         </span>
       </template>
     </v-row>
