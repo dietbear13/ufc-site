@@ -42,7 +42,10 @@
               :to="link.to"
               @click="closeMenu"
           >
-            <NuxtLink :to="link.to">{{ link.name }}</NuxtLink>
+            <NuxtLink
+                :to="link.to"
+              class="mx-2"
+            >{{ link.name }}</NuxtLink>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -56,11 +59,9 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const links = [
-  { name: 'Главная', to: '/' },
   { name: 'Бойцы', to: '/fighters' },
   { name: 'Турниры', to: '/events' },
   { name: 'Блог', to: '/blog' },
-  { name: 'Контакты', to: '/contact' }
 ]
 
 const closeMenu = () => {} // заглушка для закрытия при необходимости

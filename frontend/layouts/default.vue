@@ -1,14 +1,22 @@
 <template>
-  <v-app>
+  <div class="layout-wrapper">
+    <!-- Фиксированная шапка -->
     <TheHeader />
-    <v-main class="px-4 py-6">
+
+    <!-- Основной контент -->
+    <v-main class="layout-main">
       <NuxtPage />
     </v-main>
+
+    <!-- Прижатый футер -->
     <TheFooter />
-  </v-app>
+  </div>
 </template>
 
 <script setup lang="ts">
 import TheHeader from '@/components/ui/TheHeader.vue'
 import TheFooter from '@/components/ui/TheFooter.vue'
 </script>
+
+<style scoped>
+</style>

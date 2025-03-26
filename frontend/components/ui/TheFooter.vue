@@ -1,5 +1,10 @@
 <template>
-  <v-footer app color="grey lighten-4" class="pa-6 mt-12">
+  <v-footer
+      app
+      color="grey lighten-4"
+      class="pa-6 mt-12"
+      style="width: 100%"
+  >
     <v-container>
       <v-row>
         <!-- Блок 1 -->
