@@ -1,22 +1,3 @@
-[
-  {
-    "id": 1,
-    "slug": "conor-mcgregor",
-    "name": "Conor McGregor",
-    "nickname": "The Notorious",
-    "country": "Ireland",
-    "division": "Lightweight",
-    "record": "22-6-0",
-    "image": "/assets/images/fighter_default.png"
-  },
-  {
-    "id": 2,
-    "slug": "jon-jones",
-    "name": "Jon Jones",
-    "nickname": "Bones",
-    "country": "USA",
-    "division": "Heavyweight",
-    "record": "27-1-0",
-    "image": "/assets/images/fighter_default.png"
-  }
-]
+[{
+
+}]

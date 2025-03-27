@@ -7,12 +7,19 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "scrapEvents": "ts-node utils/parser/src/index.cjs --tournaments",
+    "scrapFighter": "ts-node utils/parser/src/index.cjs --fighters",
+    "scrap": "ts-node utils/parser/src/index.cjs"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@nuxtjs/sitemap": "^7.2.9",
+    "axios": "^1.8.4",
+    "cheerio": "^1.0.0",
     "date-fns": "^4.1.0",
     "fs": "^0.0.1-security",
+    "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.7",
     "nuxt": "^3.16.1",
@@ -20,8 +27,10 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@types/node": "^22.13.13",
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^22.13.14",
     "sass": "^1.86.0",
+    "tsx": "^4.19.3",
     "vite-plugin-vuetify": "^2.1.0",
     "vuetify": "^3.7.18"
   }

@@ -1,4 +1,4 @@
-// server/index.ts
+// server/index.cjs
 import { createServer } from 'http';
 import express from 'express';
 import { loadNuxt } from 'nuxt';

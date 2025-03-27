@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   srcDir: '.', // исходная директория (если нужен custom)
   app: {
     head: {
-      titleTemplate: '%s - MMA World',  // шаблон заголовка страниц
+      titleTemplate: '%s на MMA World',  // шаблон заголовка страниц
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'theme-color', content: '#EF4444' }  // цвет темы (например, красный UFC)
@@ -31,7 +31,7 @@ export default defineNuxtConfig({
         config.plugins.push(vuetify({ autoImport: true }))
       })
     },
-    //...
+    '@nuxtjs/sitemap',
   ],
 
   vite: {

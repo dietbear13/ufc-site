@@ -1,0 +1,37 @@
+[
+  {
+    "id": 101,
+    "slug": "ufc-300",
+    "name": "UFC 300",
+    "date": "2025-04-12",
+    "location": "Las Vegas, Nevada",
+    "poster": "/assets/images/ufc_logo.jpg",
+    "main_card": [
+      {
+        "fighter1": "Jon Jones",
+        "fighter2": "Stipe Miocic",
+        "result": "Jon Jones победа (KO, R2)"
+      },
+      {
+        "fighter1": "Sean O'Malley",
+        "fighter2": "Merab Dvalishvili",
+        "result": "O'Malley победа (UD)"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "slug": "ufc-fight-night-236",
+    "name": "UFC Fight Night 236",
+    "date": "2025-03-30",
+    "location": "London, UK",
+    "poster": "/assets/images/ufc_logo.jpg",
+    "main_card": [
+      {
+        "fighter1": "Arnold Allen",
+        "fighter2": "Dan Ige",
+        "result": "TBD"
+      }
+    ]
+  }
+]
