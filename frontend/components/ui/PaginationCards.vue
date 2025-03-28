@@ -34,7 +34,7 @@ const route = useRoute()
 const router = useRouter()
 
 const currentPage = ref(Number(route.query.p) || 1)
-const perPage = computed(() => props.perPage || 6)
+const perPage = computed(() => props.perPage || 12)
 
 watch(currentPage, (val) => {
   router.replace({ query: { ...route.query, p: val === 1 ? undefined : String(val) } })

@@ -1,74 +1,88 @@
 <template>
-  <v-app-bar
-      app
-      color="white"
-      flat
-      class="border-b"
-  >
-    <v-container class="d-flex align-center justify-space-between">
-      <!-- Лого -->
-      <NuxtLink to="/" class="text-h5 font-weight-bold text-red-darken-2">
-        MMA<span class="text-black">World</span>
-      </NuxtLink>
+  <v-app-bar height="64">
+    <v-container fluid>
+      <v-row align="center" justify="space-between" no-gutters>
+        <!-- Левая часть: логотип -->
+        <v-col cols="auto">
+          <NuxtLink to="/" class="text-h5 font-weight-bold text-red-darken-2">
+            MMA<span class="text-black">World</span>
+          </NuxtLink>
+        </v-col>
 
-      <!-- Навигация (desktop) -->
-      <div class="d-none d-md-flex align-center gap-4">
-        <NuxtLink
-            v-for="link in links"
-            :key="link.to"
-            :to="link.to"
-            class="text-body-1 font-medium hover:text-primary"
-            :class="{ 'text-primary': route.path.startsWith(link.to) }"
-        >
-          {{ link.name }}
-        </NuxtLink>
-      </div>
+        <!-- Правая часть (desktop) -->
+        <v-col cols="auto" v-if="mdAndUp">
+          <v-row align="center" no-gutters class="gap-3">
+            <v-btn
+                v-for="(item, i) in menuItems"
+                :key="i"
+                :to="item.link"
+                variant="text"
+                class="text-button"
+            >
+              {{ item.title }}
+            </v-btn>
+          </v-row>
+        </v-col>
 
-      <!-- Меню для мобильных -->
-      <v-menu
-          class="d-md-none"
-          offset-y
-          transition="slide-y-transition"
-      >
-        <template #activator="{ props }">
-          <v-btn icon v-bind="props">
+        <!-- Бургер (mobile) -->
+        <v-col cols="auto" v-if="smAndDown">
+          <v-btn icon variant="text" @click="drawer = !drawer">
             <v-icon>mdi-menu</v-icon>
           </v-btn>
-        </template>
-        <v-list>
-          <v-list-item
-              v-for="link in links"
-              :key="link.to"
-              :to="link.to"
-              @click="closeMenu"
-          >
-            <NuxtLink
-                :to="link.to"
-              class="mx-2"
-            >{{ link.name }}</NuxtLink>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+        </v-col>
+      </v-row>
     </v-container>
   </v-app-bar>
+
+  <!-- Drawer справа -->
+  <v-navigation-drawer
+      v-model="drawer"
+      location="end"
+      temporary
+  >
+    <v-list>
+      <v-list-item
+          v-for="(item, i) in menuItems"
+          :key="i"
+          @click="goTo(item.link)"
+      >
+        <v-list-item-title>{{ item.title }}</v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
+import { useDisplay } from 'vuetify'
 
-const route = useRoute()
-
-const links = [
-  { name: 'Бойцы', to: '/fighters' },
-  { name: 'Турниры', to: '/events' },
-  { name: 'Блог', to: '/blog' },
+// Массив пунктов меню
+const menuItems = [
+  { title: 'Бойцы', link: '/fighters' },
+  { title: 'Турниры', link: '/events' },
+  { title: 'Новости', link: '/blog' }
 ]
 
-const closeMenu = () => {} // заглушка для закрытия при необходимости
+// Реф для управления Drawer
+const drawer = ref(false)
+
+// useDisplay из Vuetify даёт реактивные флаги:
+const { smAndDown, mdAndUp } = useDisplay()
+
+function goTo(link: string) {
+  drawer.value = false
+  // Если нужно программно переходить: useRouter().push(link)
+  // Или можно обернуть <v-list-item> в <NuxtLink> напрямую
+}
 </script>
 
 <style scoped>
-.border-b {
-  border-bottom: 1px solid #eee;
+.text-button {
+  font-weight: 500;
+  color: #424242;
+  text-transform: none;
+}
+.text-button:hover {
+  background-color: rgba(0,0,0,0.04);
 }
 </style>
