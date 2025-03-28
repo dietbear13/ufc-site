@@ -464,7 +464,6 @@ async function parseFighter(url) {
     }
 
     if (!fightsHistoryRaw || fightsHistoryRaw.length === 0) {
-        console.log(`⚠️ Пропущен боец без истории боёв: ${url}`);
         return null;
     }
 

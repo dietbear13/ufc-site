@@ -11,12 +11,21 @@
 
 <script setup>
 import FighterCard from '../../components/FighterCard.vue'
-import { useFighters } from '../../composables/useFighters'
 import PaginationCards from '../../components/ui/PaginationCards.vue'
 import { useSeoHead } from '../../composables/useSeoHead'
+import { useApi } from '~/composables/useApi'
 
-const { fighters, loadFighters } = useFighters()
-await loadFighters()
+const { data: fighters } = await useAsyncData('fighters', () =>
+    useApi('/fighters', {
+      lazy: false,
+      cacheKey: 'fighters',
+      transform: (data) => data.fighters || data
+    }).refresh()
+)
+
+// import { useFighters } from '../../composables/useFighters'
+// const { fighters, loadFighters } = useFighters()
+// await loadFighters()
 
 useSeoHead({
   title: 'Список бойцов UFC',

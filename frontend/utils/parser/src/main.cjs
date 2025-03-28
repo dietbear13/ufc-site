@@ -108,36 +108,48 @@ async function main(args = []) {
         newEvents.sort((a, b) => a.date.localeCompare(b.date));
     }
 
-    // ----------- Парсинг БОЙЦОВ -----------
+// ----------- Парсинг БОЙЦОВ -----------
     if (runFighters || doBoth) {
         console.log('🥊 Fetching fighter list...');
         const fighterLinks = await getAllFighterLinks();
         console.log(`🔗 Found ${fighterLinks.length} fighters.`);
-        let idx = 0;
 
-        for (const url of fighterLinks) {
-            idx++;
+        const BATCH_SIZE = 50;
+        let currentBatch = [];
+        let fighterId = existingFighters.reduce((max, ft) => Math.max(max, ft.id || 0), 0);
+
+        for (let idx = 0; idx < fighterLinks.length; idx++) {
+            const url = fighterLinks[idx];
+
             try {
                 const parsed = await parseFighter(url);
                 if (!parsed) continue;
 
                 const { slug, data } = parsed;
+
                 if (existingFighterMap.has(slug)) {
                     data.id = existingFighterMap.get(slug).id;
                 } else {
-                    const maxId = existingFighters.reduce((max, ft) => Math.max(max, ft.id || 0), 0);
-                    data.id = maxId + 1;
+                    data.id = ++fighterId;
                 }
-                newFighters.push(data);
+
+                currentBatch.push(data);
             } catch (err) {
                 console.warn(`❌ Error parsing fighter (${url}): ${err instanceof Error ? err.message : err}`);
             }
-            if (idx % 50 === 0) {
-                console.log(`[${idx}/${fighterLinks.length}] ...`);
+
+            if ((idx + 1) % 50 === 0 || idx === fighterLinks.length - 1) {
+                if (currentBatch.length) {
+                    await insertBatch('fighters', currentBatch);
+                    console.log(`💾 Saved batch of ${currentBatch.length} fighters [${idx + 1}/${fighterLinks.length}]`);
+                    currentBatch = [];
+                }
             }
+
             await sleep(DELAY_MS_FIGHTERS);
         }
-        console.log(`✅ Finished parsing fighters. Total parsed: ${newFighters.length}`);
+
+        console.log(`✅ Finished parsing fighters`);
     }
 
     // ----------- Связки -----------

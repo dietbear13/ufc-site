@@ -11,12 +11,19 @@
 
 <script setup>
 import EventCard from '../../components/EventCard.vue'
-import { useEvents } from '../../composables/useEvents'
-import PaginationCards from '~/components/ui/PaginationCards.vue'
-import { useSeoHead } from '~/composables/useSeoHead'
+import PaginationCards from '../../components/ui/PaginationCards.vue'
+import { useSeoHead } from '../../composables/useSeoHead'
+import { useApi } from '../../composables/useApi'
 
-const { events, loadEvents } = useEvents()
-await loadEvents()
+// ✅ Запрашиваем один турнир по slug через API
+const { data: events } = await useAsyncData('events', () =>
+    useApi('/events', {
+      lazy: false,
+      cacheKey: 'events',
+      transform: (data) => data.events || data
+    }).refresh()
+)
+
 
 useSeoHead({
   title: 'Календарь турниров UFC',

@@ -1,5 +1,8 @@
 // frontend/composables/useApi.ts
 
+import { useFetch, useState, useRuntimeConfig, createError } from '#app'
+import { computed, type Ref } from 'vue'
+
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 interface UseApiOptions<T> {
@@ -17,7 +20,9 @@ export function useApi<T = any>(
     url: string,
     options: UseApiOptions<T> = {}
 ) {
-    const baseUrl = 'http://localhost:3001/api'
+    const config = useRuntimeConfig()
+    const baseUrl = config.public.apiBase || 'http://localhost:3001/api'
+
     const fullUrl = computed(() => {
         const paramString = options.params
             ? '?' + new URLSearchParams(options.params as any).toString()
@@ -30,7 +35,7 @@ export function useApi<T = any>(
 
     const fetchData = async () => {
         const { data, error } = await useFetch<T>(fullUrl.value, {
-            method: options.method as any || 'GET',
+            method: options.method || 'GET',
             body: options.body,
             headers: options.headers,
         })
@@ -42,6 +47,7 @@ export function useApi<T = any>(
         state.value = options.transform
             ? options.transform(data.value as T)
             : (data.value as T)
+
         return state.value
     }
 

@@ -87,16 +87,22 @@
 </template>
 
 <script setup lang="ts">
-import { useFighters } from '../../composables/useFighters'
 import { useRoute } from 'vue-router'
 import { useSeoSchemaBuilder } from '../../composables/useSeoSchemaBuilder'
 import { useSeoHead } from '../../composables/useSeoHead'
+import { useApi } from '../../composables/useApi'
+
+const { data: fighters } = await useAsyncData('fighters', () =>
+    useApi('/fighters', {
+      lazy: false,
+      cacheKey: 'fighters',
+      transform: (data) => data.fighters || data
+    }).refresh()
+)
 
 const route = useRoute()
-const { fighters, loadFighters } = useFighters()
 const fighter = ref(null)
 
-await loadFighters()
 fighter.value = fighters.value.find(f => f.slug === route.params.slug)
 
 watchEffect(() => {
