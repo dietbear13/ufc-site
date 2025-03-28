@@ -377,6 +377,8 @@ function parseFightsHistory($) {
  */
 async function parseFighter(url) {
     const $ = await fetchHTML(url);
+
+
     const basicInfo = parseFighterData($);
     const { winMethods, loseMethods } = parseWinLossMethods($);
 
@@ -460,6 +462,12 @@ async function parseFighter(url) {
             return fight;
         });
     }
+
+    if (!fightsHistoryRaw || fightsHistoryRaw.length === 0) {
+        console.log(`⚠️ Пропущен боец без истории боёв: ${url}`);
+        return null;
+    }
+
 
     return { slug: fighterData.slug, data: fighterData };
 }

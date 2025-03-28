@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { insertBatch, closeDB } = require('./db.cjs');
 
 const { getEventLinks, parseEvent } = require('./events.cjs');
 const { getAllFighterLinks, parseFighter } = require('./fighters.cjs');
@@ -19,11 +20,24 @@ const {
 const { sleep } = require('./utils.cjs');
 
 /**
+ * Сохраняет массив данных пакетами в указанную коллекцию MongoDB
+ * @param {Array} items
+ * @param {string} collectionName
+ */
+async function saveInBatches(items, collectionName) {
+    const BATCH_SIZE = 100;
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+        const chunk = items.slice(i, i + BATCH_SIZE);
+        await insertBatch(collectionName, chunk);
+    }
+}
+
+/**
  * Главная функция, которая занимается сбором данных:
  * 1) Загружает (или создает) списки tournaments/fighters
  * 2) Парсит новые/обновляет существующие
  * 3) Связывает сущности
- * 4) Сохраняет в JSON
+ * 4) Сохраняет в MongoDB пакетами
  * @param {string[]} args - аргументы командной строки
  */
 async function main(args = []) {
@@ -56,20 +70,19 @@ async function main(args = []) {
         console.log('📅 Fetching event list...');
         const eventLinks = await getEventLinks();
         console.log(`🔗 Found ${eventLinks.length} events.`);
-        let count = 0;
 
         for (const link of eventLinks) {
-            count++;
             try {
-                const { slug, data } = await parseEvent(link);
+                const parsed = await parseEvent(link);
+                if (!parsed) continue;
+
+                const { slug, data } = parsed;
                 const eventDate = new Date(data.date + 'T00:00:00');
                 const today = new Date();
                 const isFuture = eventDate >= new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-                if (!isFuture && existingEventMap.has(slug)) {
-                    // Уже в базе и прошедшее
-                    continue;
-                }
+                if (!isFuture && existingEventMap.has(slug)) continue;
+
                 if (existingEventMap.has(slug)) {
                     data.id = existingEventMap.get(slug).id;
                 } else {
@@ -84,13 +97,14 @@ async function main(args = []) {
             await sleep(DELAY_MS_EVENTS);
         }
 
-        // Оставляем все прошедшие из старых
+        // Добавляем старые прошедшие турниры
         const pastEvents = existingEvents.filter(ev => {
             const evDate = new Date(ev.date + 'T00:00:00');
-            return evDate < new Date(new Date().toISOString().split('T')[0]);
+            return evDate < new Date();
         });
         pastEvents.forEach(ev => newEvents.push(ev));
-        // Сортируем
+
+        // Сортируем по дате
         newEvents.sort((a, b) => a.date.localeCompare(b.date));
     }
 
@@ -104,18 +118,19 @@ async function main(args = []) {
         for (const url of fighterLinks) {
             idx++;
             try {
-                const { slug, data } = await parseFighter(url);
+                const parsed = await parseFighter(url);
+                if (!parsed) continue;
+
+                const { slug, data } = parsed;
                 if (existingFighterMap.has(slug)) {
                     data.id = existingFighterMap.get(slug).id;
                 } else {
-                    const maxFId = existingFighters.reduce((max, ft) => Math.max(max, ft.id || 0), 0);
-                    data.id = maxFId + 1;
+                    const maxId = existingFighters.reduce((max, ft) => Math.max(max, ft.id || 0), 0);
+                    data.id = maxId + 1;
                 }
                 newFighters.push(data);
             } catch (err) {
-                console.warn(`❌ Error parsing fighter (${url}): ${
-                    err instanceof Error ? err.message : err
-                }`);
+                console.warn(`❌ Error parsing fighter (${url}): ${err instanceof Error ? err.message : err}`);
             }
             if (idx % 50 === 0) {
                 console.log(`[${idx}/${fighterLinks.length}] ...`);
@@ -125,37 +140,26 @@ async function main(args = []) {
         console.log(`✅ Finished parsing fighters. Total parsed: ${newFighters.length}`);
     }
 
-    // ----------- Сводим данные вместе -----------
+    // ----------- Связки -----------
     const finalEvents = (runEvents || doBoth) ? newEvents : existingEvents;
     const finalFighters = (runFighters || doBoth) ? newFighters : existingFighters;
 
-    // ----------- Связки -----------
-    // 1) Привязываем слаги бойцов к карточкам турниров
     linkFightersInEvents(finalFighters, finalEvents);
-
-    // 2) Привязываем слаги турниров и оппонентов в истории боёв
     linkEventsAndOpponentsInHistory(finalFighters, finalEvents);
-
-    // 3) Обновляем результаты боёв в турнирах на основе истории бойцов
     updateEventFightResults(finalFighters, finalEvents);
 
-    // ----------- Сохранение -----------
+    // ----------- Сохранение в MongoDB -----------
     if (runEvents || doBoth) {
-        fs.writeFileSync(
-            path.join('assets/mock', 'events.json'),
-            JSON.stringify(finalEvents, null, 2),
-            'utf8'
-        );
-        console.log(`💾 Saved events.json with ${finalEvents.length} events`);
+        const validEvents = newEvents.filter(Boolean);
+        await saveInBatches(validEvents, 'events');
     }
+
     if (runFighters || doBoth) {
-        fs.writeFileSync(
-            path.join('assets/mock', 'fighters.json'),
-            JSON.stringify(finalFighters, null, 2),
-            'utf8'
-        );
-        console.log(`💾 Saved fighters.json with ${finalFighters.length} fighters`);
+        const validFighters = newFighters.filter(Boolean);
+        await saveInBatches(validFighters, 'fighters');
     }
+
+    await closeDB();
 }
 
 module.exports = {

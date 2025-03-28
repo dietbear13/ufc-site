@@ -56,6 +56,9 @@ async function getEventLinks() {
  * @param {string} sectionId
  * @returns {Array} - Массив боёв
  */
+
+
+
 function parseFightCardSection($, sectionId) {
     const card = [];
     $(`#${sectionId} li.other-fights-list__item`).each((_, li) => {
@@ -89,10 +92,15 @@ function parseFightCardSection($, sectionId) {
  */
 async function parseEvent(url) {
     const $ = await fetchHTML(url);
-    let title = $('h1.tournament-top__title, .events__title').first().text().trim();
-    if (!title) {
-        title = $('title').text().trim();
+
+    const h1 = $('h1.tournament-top__title, .events__title').first().text().trim();
+    if (!h1) {
+        console.log(`⚠️ Пропущен пустой турнир по ссылке: ${url}`);
+        return null;
     }
+// /html/body/main/section/div/div[4]/div[1]
+
+    let title = h1 || $('title').text().trim();
     const rawDate = $('.tournament-date .date').text().trim();
     const date = convertDate(rawDate) || extractDateFromTitle(title);
     const time = $('.tournament-date .time').text().trim();
