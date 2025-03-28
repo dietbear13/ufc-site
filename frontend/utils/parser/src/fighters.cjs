@@ -465,15 +465,20 @@ async function parseFighter(url) {
 }
 
 /**
- * Собираем все ссылки на профили бойцов, обходя страницы в обратном порядке – от последней к первой.
- * Сначала извлекается номер последней страницы из блока пагинации, затем цикл идёт от lastPageNumber до 1.
- * @returns {Promise<string[]>}
+ * Собираем все ссылки на профили бойцов итеративным подходом:
+ * 1) Загружаем первую страницу (базовый URL),
+ * 2) Находим номер "последней" страницы из блока <a> "Последняя",
+ * 3) Начинаем цикл со 2-й страницы и идём до lastPageNumber,
+ *    формируя URL вида /ru/fighters/page-{i}.html
+ *
+ * Никакой логики "если нет ссылки 'следующая', заканчиваем" — мы
+ * просто проходим от 2 до lastPageNumber.
  */
 async function getAllFighterLinks() {
     const links = new Set();
     let lastPageNumber = 0;
 
-    // Загружаем первую страницу, чтобы получить номер последней страницы из навигации
+    console.log(`Парсинг первой страницы: ${FIGHTERS_LIST_URL}`);
     let $;
     try {
         $ = await fetchHTML(FIGHTERS_LIST_URL);
@@ -482,10 +487,21 @@ async function getAllFighterLinks() {
         return Array.from(links);
     }
 
-    // Извлекаем ссылку "Последняя"
-    const lastLink = $('div.pages a').filter((_, el) => {
-        return $(el).text().trim().toLowerCase() === 'последняя';
-    }).attr('href');
+    // Собираем ссылки с первой страницы
+    let foundOnFirstPage = 0;
+    $('a[href^="/ru/fighters/"]').each((_, el) => {
+        const href = $(el).attr('href');
+        if (href.endsWith('.html') && !href.includes('page-')) {
+            links.add(BASE_URL + href);
+            foundOnFirstPage++;
+        }
+    });
+    console.log(`Найдено ссылок на первой странице: ${foundOnFirstPage}`);
+
+    // Извлекаем ссылку "Последняя" из блока пагинации
+    const lastLink = $('div.pages a')
+        .filter((_, el) => $(el).text().trim().toLowerCase() === 'последняя')
+        .attr('href');
 
     if (lastLink) {
         const match = lastLink.match(/page-(\d+)\.html/);
@@ -493,17 +509,15 @@ async function getAllFighterLinks() {
             lastPageNumber = parseInt(match[1], 10);
         }
     }
-
     if (!lastPageNumber) {
-        console.warn('Не удалось определить номер последней страницы, используем запасное значение.');
+        console.warn('Не удалось определить номер последней страницы — используем MAX_FIGHTER_PAGES');
         lastPageNumber = MAX_FIGHTER_PAGES;
     }
+    console.log(`Номер последней страницы: ${lastPageNumber}`);
 
-    console.log(`Общее количество страниц бойцов (по навигации): ${lastPageNumber}`);
-
-    // Обходим страницы от последней к первой
-    for (let i = lastPageNumber; i >= 1; i--) {
-        let pageUrl = (i === 1) ? FIGHTERS_LIST_URL : `${FIGHTERS_LIST_URL}page-${i}.html`;
+    // Основной цикл: от 2-й до последней страницы
+    for (let i = 2; i <= lastPageNumber; i++) {
+        const pageUrl = `${FIGHTERS_LIST_URL}page-${i}.html`;
         console.log(`Парсинг страницы: ${pageUrl}`);
 
         try {
@@ -513,17 +527,27 @@ async function getAllFighterLinks() {
             continue;
         }
 
-        let foundOnPage = 0;
+        // Сохраняем размер Set до добавления ссылок
+        const beforeCount = links.size;
+
+        let foundOnThisPage = 0;
         $('a[href^="/ru/fighters/"]').each((_, el) => {
             const href = $(el).attr('href');
             if (href.endsWith('.html') && !href.includes('page-')) {
                 links.add(BASE_URL + href);
-                foundOnPage++;
+                foundOnThisPage++;
             }
         });
-        console.log(`Найдено ссылок на странице ${i}: ${foundOnPage}`);
+        console.log(`Найдено ссылок на странице ${i}: ${foundOnThisPage}`);
+
+        // Проверка: если на текущей странице не добавилось новых ссылок, завершаем цикл
+        if (links.size === beforeCount) {
+            console.log(`Нет прироста ссылок на странице ${i}, завершаем обход.`);
+            break;
+        }
         await sleep(DELAY_MS_FIGHTERS);
     }
+
     return Array.from(links);
 }
 

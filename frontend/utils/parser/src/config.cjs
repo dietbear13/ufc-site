@@ -5,8 +5,8 @@ const BASE_URL = 'https://gidstats.com';
 const EVENTS_URL = `${BASE_URL}/ru/events/`;
 const FIGHTERS_LIST_URL = `${BASE_URL}/ru/fighters/`;
 const MAX_FIGHTER_PAGES = 500;
-const DELAY_MS_EVENTS = 1000;
-const DELAY_MS_FIGHTERS = 500;
+const DELAY_MS_EVENTS = 1001;
+const DELAY_MS_FIGHTERS = 1001;
 const USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',

@@ -7,7 +7,7 @@ import * as cheerio from 'cheerio';
 import * as crypto from 'crypto';
 // @ts-ignore: gray-matter has no default export in types
 import matter from 'gray-matter';
-import { Fuse } from 'fuse.js';
+const Fuse = require('fuse.js');
 */
 
 /** Подключение необходимых модулей (CommonJS) */
@@ -16,8 +16,7 @@ const path = require('path');
 const cheerio = require('cheerio');
 const crypto = require('crypto');
 const matter = require('gray-matter');
-const { Fuse } = require('fuse.js');
-// const { axios } = require('axios');
+const Fuse = require('fuse.js');
 const axios = require('axios');
 
 /*
