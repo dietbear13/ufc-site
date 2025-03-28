@@ -26,7 +26,7 @@
 import { useRoute } from 'vue-router'
 import TheHeader from '@/components/ui/TheHeader.vue'
 import TheFooter from '@/components/ui/TheFooter.vue'
-import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import Breadcrumbs from '../components/ui/Breadcrumbs.vue'
 import SeoBreadcrumbs from '@/components/SeoBreadcrumbs.vue' // новый компонент
 
 const route = useRoute()
