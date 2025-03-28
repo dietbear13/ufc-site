@@ -1,13 +1,11 @@
-export const useFighters = () => {
-    const fighters = ref([])
+// frontend/composables/useFighters.ts
+import { useApi } from './useApi'
 
-    const loadFighters = async () => {
-        const data = await import('../assets/mock/fighters.json')
-        fighters.value = data.default
-    }
+export const useFighters = () => {
+    const { data: fighters, fetchData: loadFighters } = useApi('/fighters')
 
     return {
         fighters,
-        loadFighters
+        loadFighters,
     }
 }

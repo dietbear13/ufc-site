@@ -1,13 +1,11 @@
-export const useEvents = () => {
-    const events = ref([])
+// frontend/composables/useEvents.ts
+import { useApi } from './useApi'
 
-    const loadEvents = async () => {
-        const data = await import('../assets/mock/events.json')
-        events.value = data.default
-    }
+export const useEvents = () => {
+    const { data: events, fetchData: loadEvents } = useApi('/events')
 
     return {
         events,
-        loadEvents
+        loadEvents,
     }
 }
