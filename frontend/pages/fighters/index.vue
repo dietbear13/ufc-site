@@ -1,35 +1,88 @@
-<template>
-  <v-container>
-    <h1 class="text-h5 mb-4">Список бойцов</h1>
-    <PaginationCards :items="fighters">
-      <template #default="{ item }">
-        <FighterCard :fighter="item" />
-      </template>
-    </PaginationCards>
-  </v-container>
-</template>
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useApi } from '../../composables/useApi'
 
-<script setup>
-import FighterCard from '../../components/FighterCard.vue'
-import PaginationCards from '../../components/ui/PaginationCards.vue'
-import { useSeoHead } from '../../composables/useSeoHead'
-import { useApi } from '~/composables/useApi'
+// Параметры пагинации
+const route = useRoute()
+const router = useRouter()
 
-const { data: fighters } = await useAsyncData('fighters', () =>
-    useApi('/fighters', {
-      lazy: false,
-      cacheKey: 'fighters',
-      transform: (data) => data.fighters || data
-    }).refresh()
-)
+const page = ref<number>(parseInt(route.query.page as string) || 1)
+const limit = 12
 
-// import { useFighters } from '../../composables/useFighters'
-// const { fighters, loadFighters } = useFighters()
-// await loadFighters()
+// useApi без search
+const {
+  data: fightersData,
+  refresh,
+  set
+} = useApi('/fighters', {
+  params: {
+    page: page.value,
+    limit: limit
+  },
+  immediate: false
+})
 
-useSeoHead({
-  title: 'Список бойцов UFC',
-  description: 'Актуальные профили бойцов UFC с фото, страной, рекордами и весом.',
-  canonical: 'http://localhost:3000/fighters'
+const isLoading = ref(false)
+const errorMsg = ref<string | null>(null)
+
+async function loadData() {
+  try {
+    isLoading.value = true
+    await refresh()
+    errorMsg.value = null
+  } catch (error: any) {
+    errorMsg.value = error.message || 'Ошибка при загрузке'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Загружаем при монтировании
+onMounted(() => {
+  loadData()
+})
+
+// Следим за page => обновляем router query => перезапрашиваем
+watch(page, () => {
+  router.replace({
+    query: {
+      page: String(page.value)
+    }
+  })
+  loadData()
 })
 </script>
+
+<template>
+  <v-container>
+    <!-- Ошибка -->
+    <div v-if="errorMsg">
+      <p>Ошибка: {{ errorMsg }}</p>
+    </div>
+    <!-- Прелоадер -->
+    <div v-else-if="isLoading">
+      <p>Загрузка...</p>
+    </div>
+    <!-- Список бойцов -->
+    <div v-else>
+      <v-row>
+        <v-col
+            v-for="fighter in fightersData?.fighters"
+            :key="fighter.slug"
+            cols="12" sm="6" md="4"
+        >
+          <FighterCard :fighter="fighter" />
+        </v-col>
+      </v-row>
+
+      <!-- Пагинация -->
+      <v-pagination
+          class="mt-4"
+          v-model="page"
+          :length="Math.ceil((fightersData?.total || 0) / limit)"
+          total-visible="5"
+      />
+    </div>
+  </v-container>
+</template>

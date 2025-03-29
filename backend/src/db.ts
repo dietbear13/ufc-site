@@ -1,14 +1,15 @@
-// src/db.ts
-import { MongoClient, Db } from 'mongodb'
+// src/db.ts (НОВЫЙ вариант)
 
-const uri = 'mongodb://localhost:27017'
-const client = new MongoClient(uri)
-let db: Db
+import mongoose from 'mongoose'
 
-export async function connectToDB() {
-    if (!db) {
-        await client.connect()
-        db = client.db('ufc-data')
+const MONGO_URI = 'mongodb://localhost:27017/ufc-data'
+
+export async function connectDB(): Promise<void> {
+    if (mongoose.connection.readyState === 0) {
+        // Подключаемся один раз (await — чтобы не было buffering)
+        await mongoose.connect(MONGO_URI, {
+            // если нужно, добавьте опции
+        })
+        console.log('✅ Mongoose connected to', MONGO_URI)
     }
-    return db
 }
